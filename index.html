@@ -98,7 +98,7 @@ function startAutoScroll(){
     const maxY=Math.max(0,scroller.scrollHeight-window.innerHeight);
     const current=Math.max(window.pageYOffset||0,scroller.scrollTop||0,document.body.scrollTop||0);
     if(current>=maxY-2){autoScrollFrame=null;return}
-    const next=Math.min(maxY,current+elapsed*.035);
+    const next=Math.min(maxY,current+elapsed*.09);
     scroller.scrollTop=next;document.documentElement.scrollTop=next;document.body.scrollTop=next;
     autoScrollFrame=requestAnimationFrame(step);
   }
