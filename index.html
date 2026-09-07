@@ -92,6 +92,8 @@ function startAutoScroll(){
   if(autoScrollFrame)cancelAnimationFrame(autoScrollFrame);
   autoScrollLast=0;
   const scroller=document.scrollingElement||document.documentElement;
+  document.documentElement.style.scrollBehavior='auto';
+  document.body.style.scrollBehavior='auto';
   function step(now){
     if(!autoScrollLast)autoScrollLast=now;
     const elapsed=Math.min(64,now-autoScrollLast);autoScrollLast=now;
@@ -99,7 +101,7 @@ function startAutoScroll(){
     const current=Math.max(window.pageYOffset||0,scroller.scrollTop||0,document.body.scrollTop||0);
     if(current>=maxY-2){autoScrollFrame=null;return}
     const next=Math.min(maxY,current+elapsed*.09);
-    scroller.scrollTop=next;document.documentElement.scrollTop=next;document.body.scrollTop=next;
+    window.scrollTo(0,next);
     autoScrollFrame=requestAnimationFrame(step);
   }
   autoScrollFrame=requestAnimationFrame(step);
