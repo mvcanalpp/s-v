@@ -87,21 +87,25 @@ invitationAudio.loop=true;invitationAudio.preload='auto';let on=false;
 async function startMusic(){try{await invitationAudio.play();music.classList.add('playing');music.setAttribute('aria-label','Müziği durdur');on=true}catch(error){on=false}}
 function stopMusic(){invitationAudio.pause();music.classList.remove('playing');music.setAttribute('aria-label','Müziği başlat');on=false}
 music.onclick=()=>{if(on)stopMusic();else startMusic()};
-let autoScrollFrame=null,autoScrollLast=0;
+let autoScrollFrame=null,autoScrollLast=0,autoScrollPosition=0;
 function startAutoScroll(){
   if(autoScrollFrame)cancelAnimationFrame(autoScrollFrame);
   autoScrollLast=0;
   const scroller=document.scrollingElement||document.documentElement;
+  autoScrollPosition=Math.max(window.pageYOffset||0,scroller.scrollTop||0);
   document.documentElement.style.scrollBehavior='auto';
   document.body.style.scrollBehavior='auto';
   function step(now){
     if(!autoScrollLast)autoScrollLast=now;
-    const elapsed=Math.min(64,now-autoScrollLast);autoScrollLast=now;
+    const elapsed=now-autoScrollLast;
+    if(elapsed<33){autoScrollFrame=requestAnimationFrame(step);return}
+    autoScrollLast=now;
     const maxY=Math.max(0,scroller.scrollHeight-window.innerHeight);
     const current=Math.max(window.pageYOffset||0,scroller.scrollTop||0,document.body.scrollTop||0);
     if(current>=maxY-2){autoScrollFrame=null;return}
-    const next=Math.min(maxY,current+elapsed*.09);
-    window.scrollTo(0,next);
+    autoScrollPosition=Math.max(autoScrollPosition,current);
+    autoScrollPosition=Math.min(maxY,autoScrollPosition+Math.min(elapsed,100)*.06);
+    window.scrollTo(0,Math.round(autoScrollPosition));
     autoScrollFrame=requestAnimationFrame(step);
   }
   autoScrollFrame=requestAnimationFrame(step);
