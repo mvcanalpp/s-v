@@ -5,17 +5,20 @@
   <title>Seda Nur & Volkan | Nişan Davetiyesi</title>
   <meta name="description" content="17 Ekim 2026 · Tarih Nikah ve Balo Salonu, Ankara">
   <meta property="og:type" content="website">
+  <meta property="og:locale" content="tr_TR">
   <meta property="og:url" content="https://mvcanalpp.github.io/s-v/">
   <meta property="og:title" content="Seda Nur &amp; Volkan | Nişan Davetiyesi">
   <meta property="og:description" content="17 Ekim 2026 · Cumartesi · 19.00">
-  <meta property="og:image" content="https://mvcanalpp.github.io/s-v/og.png">
+  <meta property="og:image" content="https://mvcanalpp.github.io/s-v/sv-preview.jpg">
+  <meta property="og:image:secure_url" content="https://mvcanalpp.github.io/s-v/sv-preview.jpg">
+  <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="S &amp; V nişan davetiyesi">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Seda Nur &amp; Volkan | Nişan Davetiyesi">
   <meta name="twitter:description" content="17 Ekim 2026 · Cumartesi · 19.00">
-  <meta name="twitter:image" content="https://mvcanalpp.github.io/s-v/og.png">
+  <meta name="twitter:image" content="https://mvcanalpp.github.io/s-v/sv-preview.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Manrope:wght@300;400;500&family=Parisienne&display=swap" rel="stylesheet">
   <style>
@@ -84,14 +87,22 @@ invitationAudio.loop=true;invitationAudio.preload='auto';let on=false;
 async function startMusic(){try{await invitationAudio.play();music.classList.add('playing');music.setAttribute('aria-label','Müziği durdur');on=true}catch(error){on=false}}
 function stopMusic(){invitationAudio.pause();music.classList.remove('playing');music.setAttribute('aria-label','Müziği başlat');on=false}
 music.onclick=()=>{if(on)stopMusic();else startMusic()};
-let autoScrollTimer=null;
+let autoScrollFrame=null,autoScrollLast=0;
 function startAutoScroll(){
-  if(autoScrollTimer)clearInterval(autoScrollTimer);
-  autoScrollTimer=setInterval(()=>{
-    const maxY=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
-    if(window.scrollY>=maxY-2){clearInterval(autoScrollTimer);autoScrollTimer=null;return}
-    window.scrollBy(0,1);
-  },32);
+  if(autoScrollFrame)cancelAnimationFrame(autoScrollFrame);
+  autoScrollLast=0;
+  const scroller=document.scrollingElement||document.documentElement;
+  function step(now){
+    if(!autoScrollLast)autoScrollLast=now;
+    const elapsed=Math.min(64,now-autoScrollLast);autoScrollLast=now;
+    const maxY=Math.max(0,scroller.scrollHeight-window.innerHeight);
+    const current=Math.max(window.pageYOffset||0,scroller.scrollTop||0,document.body.scrollTop||0);
+    if(current>=maxY-2){autoScrollFrame=null;return}
+    const next=Math.min(maxY,current+elapsed*.035);
+    scroller.scrollTop=next;document.documentElement.scrollTop=next;document.body.scrollTop=next;
+    autoScrollFrame=requestAnimationFrame(step);
+  }
+  autoScrollFrame=requestAnimationFrame(step);
 }
 window.addEventListener('DOMContentLoaded',()=>{invitationAudio.load()});
 dispense.src=document.querySelector('.strip img').src;openInvitation.onclick=()=>{if(cover.classList.contains('printing'))return;cover.classList.add('printing');invitationAudio.currentTime=0;startMusic();setTimeout(()=>{cover.classList.add('opened');document.body.classList.add('invitation-open');window.scrollTo(0,0);setTimeout(startAutoScroll,500)},7500)};
